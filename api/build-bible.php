@@ -70,7 +70,7 @@ if ($id) {
             if (!file_exists(dirname($fileChapter))) {
                 mkdir(dirname($fileChapter), 0777, true);
             }
-            
+
             file_put_contents($fileChapter, json_encode($chapters));
 
             $book->chapters = $chapters;
@@ -86,13 +86,13 @@ if ($id) {
 
 
         $bible->books = $books;
-        echo json_encode([
-            'response' => [
+        header('Content-Type: application/json');
+        echo json_encode(
+            [
                 'code' => 200,
-                'message' => 'Build bible success has been saved to json file',
-                'data' => $bible
+                'message' => 'Build bible success has been saved to json file'
             ]
-        ]);
+        );
     }
 }
 
@@ -110,11 +110,11 @@ function getVerse($client, $bible_id, $usfm, $chapter_id, $book_id)
         $data = [];
         foreach ($matches as $match) {
             $verseNumber = $match[1];
-            $content = strip_tags($match[2]); 
+            $content = strip_tags($match[2]);
             $data[$verseNumber] = trim($content);
         }
 
         return $data;
-    } 
+    }
     return null;
 }

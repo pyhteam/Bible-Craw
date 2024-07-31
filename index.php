@@ -1,10 +1,11 @@
-<?php 
-    $languages = json_decode(file_get_contents('data/languages.json'));
+<?php
+$languages = json_decode(file_get_contents('data/languages.json'));
 
 
 ?>
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -21,90 +22,43 @@
 </head>
 
 <body>
+    <nav>
+        <ul class="nav justify-content-center">
+            <li class="nav-item">
+                <a class="nav-link active" href="/">Home</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="?page=crawl-bible">Crawl Bible</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="?page=crawl-verse">Crawl Verse</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" target="_blank" href="https://github.com/pyhteam/Bible-Craw">Github Project</a>
+            </li>
+        </ul>
+    </nav>
     <main>
         <div class="container">
             <div class="row">
-                <div class="col-md-12">
-                    <h3 class="text-center mt-5">Bible Crawl</h3>
-                    <div class="text-center mt-3">
-                        <!-- Card -->
-                        <div class="card">
-
-                            <div class="card-body">
-                                <h5 class="card-title">List Bible</h5>
-                                <div class="row mb-2">
-                                    <!-- select language -->
-                                    <div class="col-md-4">
-                                        <select class="form-control" id="language">
-                                            <?php foreach ($languages as $item) : ?>
-                                                <option value="<?= $item->code ?>"><?= $item->name ?></option>
-                                            <?php endforeach; ?>
-                                        </select>
-                                    </div>
-                                    <!-- button -->
-                                    <button class="btn btn-primary" onclick="fetchBible()" id="btnFetch">Get Bible</button>
-                                </div>
-                                <div class="table-responsive">
-                                    <table class="table table-bordered">
-                                        <thead>
-                                            <tr>
-                                                <th>ID</th>
-                                                <th>Code</th>
-                                                <th>Name</th>
-                                                <th>Action</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody id="dataTable">
-
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+               <?php 
+               $page = $_GET['page'] ?? '';
+                switch ($page) {
+                    case 'crawl-bible':
+                        include 'pages/crawl-bible.php';
+                        break;
+                    case 'crawl-verse':
+                        include 'pages/crawl-verse.php';
+                        break;
+                    default:
+                        include 'pages/crawl-bible.php';
+                        break;
+                }
+               ?>
             </div>
         </div>
     </main>
-    <script>
-        // fetch all language
-        document.addEventListener('DOMContentLoaded', function() {
-            // select2
-            $('#language').select2();
-        });
-
-       
-
-
-        function fetchBible() {
-            var language = $('#language').val();
-            var apiUrl = `http://localhost:8000/api/get-bibles.php?language=${language}`;
-            $.ajax({
-                url: apiUrl,
-                method: 'GET',
-                success: function(res) {
-                    console.log(res);
-                    if (res.response.code === 200) {
-                        var data = res.response.data;
-                        var html = '';
-                        data.versions.forEach(function(item) {
-                            html += `<tr>
-                                         <td>${item.id}</td>
-                                         <td>${item.abbreviation}</td>
-                                         <td>${item.local_title}</td>
-                                         <td>
-                                              <button class="btn btn-primary" onclick="fetchBooks('${item.id}')">Fetch Books</button>
-                                         </td>
-                                        </tr>`;
-                        });
-                        $('#dataTable').html(html);
-                        return;
-                    }
-                    $('#dataTable').html('<tr><td colspan="4">No data found</td></tr>');
-                }
-            });
-        }
-    </script>
+    
 </body>
 
 </html>
