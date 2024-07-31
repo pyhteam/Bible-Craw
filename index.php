@@ -1,6 +1,10 @@
+<?php 
+    $languages = json_decode(file_get_contents('data/languages.json'));
+
+
+?>
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -32,15 +36,13 @@
                                     <!-- select language -->
                                     <div class="col-md-4">
                                         <select class="form-control" id="language">
-                                            <option value="mww">Hmong Daw</option>
-                                            <option value="en">English</option>
-                                            <option value="vi">Vietnamese</option>
+                                            <?php foreach ($languages as $item) : ?>
+                                                <option value="<?= $item->code ?>"><?= $item->name ?></option>
+                                            <?php endforeach; ?>
                                         </select>
                                     </div>
                                     <!-- button -->
-                                    <div class="col-md-2">
-                                        <button class="btn btn-primary" onclick="fetchBible()" id="btnFetch">Fetch</button>
-                                    </div>
+                                    <button class="btn btn-primary" onclick="fetchBible()" id="btnFetch">Get Bible</button>
                                 </div>
                                 <div class="table-responsive">
                                     <table class="table table-bordered">
@@ -69,37 +71,9 @@
         document.addEventListener('DOMContentLoaded', function() {
             // select2
             $('#language').select2();
-
-            allLanguages();
         });
 
-        function allLanguages() {
-            var apiUrl = 'http://localhost:8000/api/all-language.php';
-            $.ajax({
-                url: apiUrl,
-                method: 'GET',
-                beforeSend: function() {
-                    $('#language').html('<option>Loading...</option>');
-                    // disable button
-                    $('#btnFetch').attr('disabled', true);
-                    $('#language').attr('disabled', true);
-
-                },
-                success: function(res) {
-                    $('#btnFetch').attr('disabled', false);
-                    $('#language').attr('disabled', false);
-
-                    if (res) {
-                        var data = JSON.parse(res);
-                        var html = '';
-                        data.forEach(function(item) {
-                            html += `<option value="${item.code}">${item.name}</option>`;
-                        });
-                        $('#language').html(html);
-                    }
-                }
-            });
-        }
+       
 
 
         function fetchBible() {

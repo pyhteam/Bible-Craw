@@ -86,7 +86,13 @@ if ($id) {
 
 
         $bible->books = $books;
-        echo json_encode($bible);
+        echo json_encode([
+            'response' => [
+                'code' => 200,
+                'message' => 'Build bible success has been saved to json file',
+                'data' => $bible
+            ]
+        ]);
     }
 }
 

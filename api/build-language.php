@@ -2,11 +2,11 @@
 include_once "../client.php";
 
 $client = new Client();
-$api = "https://www.bible.com/api/bible/configuration";
+$apiLanguage = "https://www.bible.com/api/bible/configuration";
 
-$response = $client->Get($api);
-$jsonObj = json_decode($response);
-if ($jsonObj->response->code ==200) {
+$responseLanguage = $client->Get($apiLanguage);
+$jsonObjLanguage = json_decode($responseLanguage);
+if ($jsonObjLanguage->response->code ==200) {
     $languages = [];
     foreach ($jsonObj->response->data->default_versions as $item) {
         $language = new stdClass();
@@ -24,6 +24,9 @@ if ($jsonObj->response->code ==200) {
         mkdir(dirname($fileLanguage), 0777, true);
     }
     file_put_contents($fileLanguage, json_encode($languages));
-    
-    echo json_encode($languages);
+    echo json_encode([
+        'code' => 200,
+        'message' => 'Success get all languages saved to file',
+        'data' => $languages
+    ]);
 }
