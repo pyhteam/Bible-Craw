@@ -8,6 +8,7 @@ foreach ($files as $file) {
 $bibles = array_map('unserialize', array_unique(array_map('serialize', $bibles)));
 
 
+
 ?>
 <div class="col-md-12">
     <h3 class="text-center mt-5">Bible Crawl</h3>
