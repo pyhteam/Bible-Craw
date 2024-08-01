@@ -20,6 +20,16 @@ class Client
             $headers[] = 'Content-Type: application/x-www-form-urlencoded';
             curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
         }
+        // set proxy for curl
+        // Proxy Configuration
+        $proxy = [
+            'host' => '172.20.10.1',
+            'port' => '1082'
+        ];
+        if ($proxy) {
+            curl_setopt($ch, CURLOPT_PROXY, $proxy['host']);
+            curl_setopt($ch, CURLOPT_PROXYPORT, $proxy['port']);
+        }
     }
 
     public function Get($url, $params = array())

@@ -96,7 +96,7 @@ if ($id) {
     }
 }
 
-function getVerse($client, $bible_id, $usfm, $chapter_id, $book_id)
+function getVerse($client, $bible_id, $usfm)
 {
     $api = "https://www.bible.com/_next/data/tTUWCsWY-8-dtBbuWceVo/en/bible/$bible_id/$usfm.json";
     $response = $client->Get($api); // Fetch API response

@@ -49,3 +49,15 @@ $bibles = array_map('unserialize', array_unique(array_map('serialize', $bibles))
         </div>
     </div>
 </div>
+<script>
+    function fetchVerse() {
+        var bible_id =$ ('#bible').val();
+        $.ajax({
+            url: 'api/build-verse.php?bible_id=' + bible_id,
+            method: 'GET',
+            success: function(res) {
+                console.log(res);
+            }
+        });
+    }
+</script>

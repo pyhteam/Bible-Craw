@@ -14,6 +14,10 @@ foreach ($files as $file) {
 $bibles = array_map('unserialize', array_unique(array_map('serialize', $bibles)));
 
 $bible_id = $_GET['bible_id'];
+if(!isset($bible_id)) {
+    echo json_encode(array('status'=> 'error','message'=> 'Bible not found'));
+    exit;
+}
 
 $bible = array_filter($bibles, function ($item) use ($bible_id) {
     return $item->id == $bible_id;
@@ -39,27 +43,26 @@ $books = array_merge(...$books);
 $books = array_filter($books, function ($item) use ($bible_id) {
     return $item->bible_id == $bible_id;
 });
-
+// get 2 book from array books to array books
 // get verse
+$index = 0;
 foreach ($books as $book) {
-    $book_id = $book->id;
-    $usfm = $book->usfm;
-    $book_name = $book->name;
-
+    if($index == 2) {
+        break;
+    }
     foreach($book->chapters as $chapter) {
-        $chapter_id = $chapter->id;
-        $chapter_number = $chapter->number;
-        // wait 1 second
-        sleep(1);
-        $verses = getVerse($client, $bible_id, "$chapter->code.$chapter->bible_code");
+        $chapter->verses = getVerse($client, $chapter->bible_id, "$chapter->code");
         break;
         
     }
+    $index++;
 }
+header('Content-Type: application/json');
+echo json_encode($books);
 
-function getVerse($client, $bible_id, $usfm)
+function getVerse(Client $client, $bible_id, $chapter_code)
 {
-    $api = "https://www.bible.com/_next/data/tTUWCsWY-8-dtBbuWceVo/en/bible/$bible_id/$usfm.json";
+    $api = "https://www.bible.com/_next/data/tTUWCsWY-8-dtBbuWceVo/en/bible/$bible_id/$chapter_code.json";
     $response = $client->Get($api); // Fetch API response
     // Check if the response was successful and contains valid JSON
     $jsonObj = json_decode($response);
