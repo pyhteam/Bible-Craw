@@ -1,7 +1,10 @@
-<?php 
-include_once "../client.php";
+<?php
 
-$client = new Client();
+use App\Http\HttpClient;
+
+include_once "../http-client.php";
+
+$client = new HttpClient();
 $api = "https://www.bible.com/api/bible/versions";
 
 $params = [
@@ -9,7 +12,10 @@ $params = [
     "type" => "all"
 ];
 header("Content-Type: application/json");
-$response = $client->Get($api, $params);
+
+$api = $api . "?" . http_build_query($params);
+
+$response = $client->get($api);
 if(isset(($response))) {
     echo $response;
     return;

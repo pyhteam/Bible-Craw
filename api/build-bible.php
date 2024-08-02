@@ -1,7 +1,10 @@
 <?php
-include_once "../client.php";
 
-$client = new Client();
+use App\Http\HttpClient;
+
+include_once "../http-client.php";
+
+$client = new HttpClient();
 $api = "https://www.bible.com/api/bible/version";
 
 $id = $_GET['id'];

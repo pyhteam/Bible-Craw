@@ -1,7 +1,10 @@
 <?php
-include_once "../client.php";
 
-$client = new Client();
+use App\Http\HttpClient;
+
+include_once "../http-client.php";
+
+$client = new HttpClient();
 $apiLanguage = "https://www.bible.com/api/bible/configuration";
 
 $responseLanguage = $client->Get($apiLanguage);

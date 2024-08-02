@@ -1,6 +1,9 @@
 <?php
-include_once "../client.php";
-$client = new Client();
+
+use App\Http\HttpClient;
+
+include_once "../http-client.php";
+$client = new HttpClient();
 // $api = "https://www.bible.com/_next/data/Z6GYQ1vZsA2F95Ssa1GBS/en/bible/1269/GEN.1.HMOWSV.json";
 $api = "https://www.bible.com/_next/data/Z6GYQ1vZsA2F95Ssa1GBS/en/bible/";
 
@@ -48,13 +51,19 @@ if (count($book) == 0) {
     echo json_encode(['success' => false, 'message' => 'Book not found']);
     exit;
 }
-// get 2 book from array books to array books
+$book = array_values($book)[0];
 // get verse
 $index = 0;
 $verses = [];
 
-foreach ($book[0]->chapters as $chapter) {
-    $chapterVerses = getVerse($client, $chapter->bible_id, "$chapter->code");
+foreach ($book->chapters as $chapter) {
+
+    $params = [
+        "bible_id" => $bible_id,
+        "bible_code" => $book->bible_code,
+        "chapter_code" => $chapter->code
+    ];
+    $chapterVerses = getVerse($client, $params);
     if ($chapterVerses !== null) {
         $verses = array_merge($verses, $chapterVerses);
     }
@@ -66,16 +75,27 @@ echo json_encode($verses);
 
 /**
  * Get verse from bible.com
- * @param Client $client
+ * @param HttpClient $client
  * @param string $bible_id
  * @param string $chapter_code
  * @return array|null
  */
 
 
-function getVerse($client, $bibleId, $chapterCode)
+function getVerse($client, $params)
 {
-    $api = "https://www.bible.com/_next/data/tTUWCsWY-8-dtBbuWceVo/en/bible/$bibleId/$chapterCode.json";
+    $bibleId = $params['bible_id'];
+    $chapterCode = $params['chapter_code'];
+    $bibleCode = $params['bible_code'];
+    $usfm = $chapterCode . "." . $bibleCode;
+
+    $api = "https://www.bible.com/_next/data/mlt4CWVl9WY6P4NyqRua-/en/bible/$bibleId/$usfm.json";
+    $query = [
+        "versionId" => intval($bibleId),
+        "usfm" => $usfm,
+    ];
+    $api = $api . "?" . http_build_query($query);
+
     $response = $client->Get($api);
     $jsonObj = json_decode($response);
     if (isset($jsonObj->pageProps->chapterInfo->content)) {
