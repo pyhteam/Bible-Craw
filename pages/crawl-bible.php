@@ -46,7 +46,7 @@
 
     function fetchBible() {
         var language = $('#language').val();
-        var apiUrl = `http://localhost:8000/api/get-bibles.php?language=${language}`;
+        var apiUrl = `http://localhost:8000/api/fetch-bibles.php?language=${language}`;
         $.ajax({
             url: apiUrl,
             method: 'GET',

@@ -14,6 +14,7 @@ foreach ($files as $file) {
 $bibles = array_map('unserialize', array_unique(array_map('serialize', $bibles)));
 
 $bible_id = $_GET['bible_id'];
+$book_code = $_GET['book_code'];
 if (!isset($bible_id)) {
     echo json_encode(array('status' => 'error', 'message' => 'Bible not found'));
     exit;
@@ -40,24 +41,28 @@ foreach ($filesBook as $file) {
 $books = array_merge(...$books);
 
 // get all book by bible id
-$books = array_filter($books, function ($item) use ($bible_id) {
-    return $item->bible_id == $bible_id;
+$book = array_filter($books, function ($item) use ($bible_id, $book_code) {
+    return $item->bible_id == $bible_id && $item->code == $book_code;
 });
+if (count($book) == 0) {
+    echo json_encode(['success' => false, 'message' => 'Book not found']);
+    exit;
+}
 // get 2 book from array books to array books
 // get verse
 $index = 0;
-foreach ($books as $book) {
-    if ($index == 2) {
-        break;
+$verses = [];
+
+foreach ($book[0]->chapters as $chapter) {
+    $chapterVerses = getVerse($client, $chapter->bible_id, "$chapter->code");
+    if ($chapterVerses !== null) {
+        $verses = array_merge($verses, $chapterVerses);
     }
-    foreach ($book->chapters as $chapter) {
-        $chapter->verses = getVerse($client, $chapter->bible_id, "$chapter->code");
-        break;
-    }
-    $index++;
 }
+
+
 header('Content-Type: application/json');
-echo json_encode($books);
+echo json_encode($verses);
 
 /**
  * Get verse from bible.com

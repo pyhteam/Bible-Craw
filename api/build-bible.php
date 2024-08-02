@@ -44,6 +44,7 @@ if ($id) {
             $book->code = $item->usfm;
             $book->name_short = $item->abbreviation;
             $book->name_long = $item->human_long;
+            $book->name = $item->human;
 
             // chapters
             $chapters = [];

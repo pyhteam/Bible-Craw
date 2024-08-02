@@ -1,18 +1,18 @@
 <?php 
-include_once "../client.php";
-
-$client = new Client();
-$api = "https://www.bible.com/api/bible/versions";
-
-$params = [
-    "language_tag" => $_GET['language'],
-    "type" => "all"
-];
-header("Content-Type: application/json");
-$response = $client->Get($api, $params);
-if(isset(($response))) {
-    echo $response;
-    return;
+$files = glob(__DIR__ . '/../data/bibles/*');
+if(!$files){
+    echo json_encode(array('success' => false, 'message' => 'Bible not found'));
+    exit;
 }
-echo json_encode(["message" => "No data found"]);
+$bibles = [];
+foreach ($files as $file) {
+    $bible = json_decode(file_get_contents($file));
+    $bibles[] = $bible;
+}
+$bibles = array_map('unserialize', array_unique(array_map('serialize', $bibles)));
+
+header('Content-Type: application/json');
+echo json_encode(['success' => true, 'data' => $bibles]);
+
+
 

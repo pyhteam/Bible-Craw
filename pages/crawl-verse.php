@@ -1,15 +1,3 @@
-<?php
-$files = glob(__DIR__ . '/../data/bibles/*');
-$bibles = [];
-foreach ($files as $file) {
-    $bible = json_decode(file_get_contents($file));
-    $bibles[] = $bible;
-}
-$bibles = array_map('unserialize', array_unique(array_map('serialize', $bibles)));
-
-
-
-?>
 <div class="col-md-12">
     <h3 class="text-center mt-5">Bible Crawl</h3>
     <div class="text-center mt-3">
@@ -20,10 +8,12 @@ $bibles = array_map('unserialize', array_unique(array_map('serialize', $bibles))
                 <div class="row mb-2">
                     <!-- select bible -->
                     <div class="col-md-4">
-                        <select class="form-control" id="bible">
-                            <?php foreach ($bibles as $item) : ?>
-                                <option value="<?= $item->id ?>"><?= $item->name ?></option>
-                            <?php endforeach; ?>
+                        <select class="form-control" id="bible" onchange="fetchBooks()">
+                        </select>
+                    </div>
+                    <!-- select books -->
+                    <div class="col-md-4">
+                        <select class="form-control" id="book">
                         </select>
                     </div>
                     <!-- button -->
@@ -33,9 +23,8 @@ $bibles = array_map('unserialize', array_unique(array_map('serialize', $bibles))
                     <table class="table table-bordered">
                         <thead>
                             <tr>
-                                <th>ID</th>
-                                <th>Book</th>
-                                <th>Chapter</th>
+                                <th>Bible id</th>
+                                <th>Chapter code</th>
                                 <th>Verse</th>
                                 <th>Text</th>
                             </tr>
@@ -50,13 +39,79 @@ $bibles = array_map('unserialize', array_unique(array_map('serialize', $bibles))
     </div>
 </div>
 <script>
-    function fetchVerse() {
-        var bible_id =$ ('#bible').val();
+    $(document).ready(function() {
+        fetchBible();
+    });
+    // get bible
+    function fetchBible() {
         $.ajax({
-            url: 'api/build-verse.php?bible_id=' + bible_id,
+            url: 'api/get-bibles.php',
             method: 'GET',
+            beforeSend: function() {
+                $('#bible').attr('disabled', true);
+            },
+            success: function(res) {
+                if (res.success) {
+                    var html = '';
+                    html = '<option value="">Select Bible</option>';
+                    res.data.forEach(function(item) {
+                        html += '<option value="' + item.id + '">' + item.name + '</option>';
+                    });
+                    $('#bible').html(html);
+                }
+                $('#bible').attr('disabled', false);
+            }
+        });
+    }
+    // get books
+    function fetchBooks() {
+        var bible_id = $('#bible').val();
+        $.ajax({
+            url: `api/get-books.php?bible_id=${bible_id}`,
+            method: 'GET',
+            beforeSend: function() {
+                $('#book').attr('disabled', true);
+            },
+            success: function(res) {
+                if (res.success) {
+                    var html = '';
+                    res.data.forEach(function(item) {
+                        html += '<option value="' + item.code + '">' + item.name + '</option>';
+                    });
+                    $('#book').html(html);
+                }
+                $('#book').attr('disabled', false);
+            }
+        });
+    }
+
+
+    function fetchVerse() {
+        var bible_id = $('#bible').val();
+        var book_code = $('#book').val();
+        $.ajax({
+            url: `api/build-verse.php?bible_id=${bible_id}&book_code=${book_code}`,
+            method: 'GET',
+            beforeSend: function() {
+                $('#btnFetch').attr('disabled', true);
+                $('#btnFetch').html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Loading...');
+            },
             success: function(res) {
                 console.log(res);
+                if (res) {
+                    var html = '';
+                    res.forEach(function(item) {
+                        html += '<tr>';
+                        html += '<td>' + item.bible_id + '</td>';
+                        html += '<td>' + item.chapter_code + '</td>';
+                        html += '<td>' + item.label + '</td>';
+                        html += '<td>' + item.content + '</td>';
+                        html += '</tr>';
+                    });
+                    $('#dataTable').html(html);
+                }
+                $('#btnFetch').attr('disabled', false);
+                $('#btnFetch').html('Get Verse');
             }
         });
     }
