@@ -71,16 +71,32 @@ foreach ($book->chapters as $chapter) {
 
 
 header('Content-Type: application/json');
-echo json_encode($verses);
+
+$verses = array_reduce($verses, function ($carry, $item) {
+    $key = $item['verse_code'];
+    if (!isset($carry[$key])) {
+        $carry[$key] = $item;
+    } else {
+        $carry[$key]['content'] .= ' ' . $item['content'];
+    }
+    return $carry;
+}, []);
+
+// save to file json
+$pathVerse = "../data/verses/$bible->code/$book_code.json";
+if (!file_exists(dirname($pathVerse))) {
+    mkdir(dirname($pathVerse), 0777, true);
+}
+file_put_contents($pathVerse, json_encode(array_values($verses)));
+
+echo json_encode(array_values($verses));
 
 /**
  * Get verse from bible.com
  * @param HttpClient $client
- * @param string $bible_id
- * @param string $chapter_code
+ * @param array $params
  * @return array|null
  */
-
 
 function getVerse($client, $params)
 {
@@ -113,6 +129,7 @@ function getVerse($client, $params)
         foreach ($verseNodes as $verseNode) {
             $labelNode = $xpath->query(".//span[contains(@class, 'label')]", $verseNode)->item(0);
             $contentNodes = $xpath->query(".//span[contains(@class, 'content')]", $verseNode);
+            $verseCode = $verseNode->getAttribute('data-usfm');
 
             if ($contentNodes->length > 0) {
                 $label = $labelNode ? $labelNode->textContent : '';
@@ -128,6 +145,7 @@ function getVerse($client, $params)
                     $verses[] = [
                         'bible_id' => $bibleId,
                         'chapter_code' => $chapterCode,
+                        'verse_code' => $verseCode,
                         'label' => $label,
                         'content' => $content
                     ];

@@ -25,6 +25,7 @@
                             <tr>
                                 <th>Bible id</th>
                                 <th>Chapter code</th>
+                                <th>Verse Code</th>
                                 <th>Verse</th>
                                 <th>Text</th>
                             </tr>
@@ -104,6 +105,7 @@
                         html += '<tr>';
                         html += '<td>' + item.bible_id + '</td>';
                         html += '<td>' + item.chapter_code + '</td>';
+                        html += '<td>' + item.verse_code + '</td>';
                         html += '<td>' + item.label + '</td>';
                         html += '<td>' + item.content + '</td>';
                         html += '</tr>';
