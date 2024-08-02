@@ -1,4 +1,4 @@
-<?php 
+<?php
 include_once "../client.php";
 $client = new Client();
 // $api = "https://www.bible.com/_next/data/Z6GYQ1vZsA2F95Ssa1GBS/en/bible/1269/GEN.1.HMOWSV.json";
@@ -14,8 +14,8 @@ foreach ($files as $file) {
 $bibles = array_map('unserialize', array_unique(array_map('serialize', $bibles)));
 
 $bible_id = $_GET['bible_id'];
-if(!isset($bible_id)) {
-    echo json_encode(array('status'=> 'error','message'=> 'Bible not found'));
+if (!isset($bible_id)) {
+    echo json_encode(array('status' => 'error', 'message' => 'Bible not found'));
     exit;
 }
 
@@ -47,40 +47,71 @@ $books = array_filter($books, function ($item) use ($bible_id) {
 // get verse
 $index = 0;
 foreach ($books as $book) {
-    if($index == 2) {
+    if ($index == 2) {
         break;
     }
-    foreach($book->chapters as $chapter) {
+    foreach ($book->chapters as $chapter) {
         $chapter->verses = getVerse($client, $chapter->bible_id, "$chapter->code");
         break;
-        
     }
     $index++;
 }
 header('Content-Type: application/json');
 echo json_encode($books);
 
-function getVerse(Client $client, $bible_id, $chapter_code)
+/**
+ * Get verse from bible.com
+ * @param Client $client
+ * @param string $bible_id
+ * @param string $chapter_code
+ * @return array|null
+ */
+
+
+function getVerse($client, $bibleId, $chapterCode)
 {
-    $api = "https://www.bible.com/_next/data/tTUWCsWY-8-dtBbuWceVo/en/bible/$bible_id/$chapter_code.json";
-    $response = $client->Get($api); // Fetch API response
-    // Check if the response was successful and contains valid JSON
+    $api = "https://www.bible.com/_next/data/tTUWCsWY-8-dtBbuWceVo/en/bible/$bibleId/$chapterCode.json";
+    $response = $client->Get($api);
     $jsonObj = json_decode($response);
     if (isset($jsonObj->pageProps->chapterInfo->content)) {
-        $content = $jsonObj->pageProps->chapterInfo->content;
-        // Extract verse data using regex
-        preg_match_all('/<span class="verse v(\d+)"[^>]*><span class="label">\d+<\/span><span class="content">(.*?)<\/span><\/span>/s', $content, $matches, PREG_SET_ORDER);
-        // Initialize the array
-        $data = [];
-        foreach ($matches as $match) {
-            $verseNumber = $match[1];
-            $content = strip_tags($match[2]);
-            $data[$verseNumber] = trim($content);
+        $html = $jsonObj->pageProps->chapterInfo->content;
+
+        $doc = new DOMDocument();
+        libxml_use_internal_errors(true);
+        $doc->loadHTML($html);
+        libxml_clear_errors();
+
+        $xpath = new DOMXPath($doc);
+        $verseNodes = $xpath->query("//span[contains(@class, 'verse')]");
+
+        $verses = [];
+        foreach ($verseNodes as $verseNode) {
+            $labelNode = $xpath->query(".//span[contains(@class, 'label')]", $verseNode)->item(0);
+            $contentNodes = $xpath->query(".//span[contains(@class, 'content')]", $verseNode);
+
+            if ($contentNodes->length > 0) {
+                $label = $labelNode ? $labelNode->textContent : '';
+                $content = '';
+
+                foreach ($contentNodes as $contentNode) {
+                    $content .= $contentNode->textContent . ' ';
+                }
+
+                $content = trim($content);
+
+                if (!empty($content)) {
+                    $verses[] = [
+                        'bible_id' => $bibleId,
+                        'chapter_code' => $chapterCode,
+                        'label' => $label,
+                        'content' => $content
+                    ];
+                }
+            }
         }
-        return $data;
+
+        return $verses;
     }
+
     return null;
 }
-
-
-
