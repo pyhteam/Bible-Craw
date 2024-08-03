@@ -19,7 +19,15 @@
                     <!-- button -->
                     <button class="btn btn-primary" onclick="fetchVerse()" id="btnFetch">Get Verse</button>
                 </div>
-                <div class="table-responsive">
+                <!-- process bar -->
+                <div class="progress mb-2">
+                    <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100"></div>
+                </div>
+                <!-- message -->
+                <div class="alert alert-info" role="alert">
+                    <strong>Fetching: </strong> <span id="message"></span>
+                </div>
+                <div class="table-responsive" style="height: 50rem;">
                     <table class="table table-bordered">
                         <thead>
                             <tr>
@@ -41,6 +49,18 @@
 </div>
 <script>
     $(document).ready(function() {
+        //select 2
+        $('#bible').select2();
+
+        // mutiple select
+        // item select all
+        $('#book').select2({
+            placeholder: "Select Books",
+            allowClear: true,
+            multiple: true
+
+        });
+
         fetchBible();
     });
     // get bible
@@ -74,8 +94,13 @@
                 $('#book').attr('disabled', true);
             },
             success: function(res) {
+
                 if (res.success) {
+                    // save all books to local storage
+                    localStorage.setItem('books', JSON.stringify(res.data));
+
                     var html = '';
+                    html = '<option value="ALL">All</option>';
                     res.data.forEach(function(item) {
                         html += '<option value="' + item.code + '">' + item.name + '</option>';
                     });
@@ -86,35 +111,78 @@
         });
     }
 
-
     function fetchVerse() {
         var bible_id = $('#bible').val();
-        var book_code = $('#book').val();
-        $.ajax({
-            url: `api/build-verse.php?bible_id=${bible_id}&book_code=${book_code}`,
-            method: 'GET',
-            beforeSend: function() {
-                $('#btnFetch').attr('disabled', true);
-                $('#btnFetch').html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Loading...');
-            },
-            success: function(res) {
-                console.log(res);
-                if (res) {
-                    var html = '';
-                    res.forEach(function(item) {
-                        html += '<tr>';
-                        html += '<td>' + item.bible_id + '</td>';
-                        html += '<td>' + item.chapter_code + '</td>';
-                        html += '<td>' + item.verse_code + '</td>';
-                        html += '<td>' + item.label + '</td>';
-                        html += '<td>' + item.content + '</td>';
-                        html += '</tr>';
-                    });
-                    $('#dataTable').html(html);
+        $('#dataTable').html('');
+        var book_code = [];
+
+        // Check select all
+        let all = $('#book').val();
+        if (all.includes('ALL')) {
+            var books = JSON.parse(localStorage.getItem('books'));
+            books.forEach(function(item) {
+                book_code.push(item.code);
+            });
+            console.log(book_code);
+        } else {
+            $('#book option:selected').each(function() {
+                book_code.push($(this).val());
+            });
+        }
+
+        var verses = [];
+        var completedRequests = 0;
+        const totalRequests = book_code.length;
+
+        for (let i = 0; i < totalRequests; i++) {
+            // using ajax  
+            $.ajax({
+                url: `api/build-verse.php?bible_id=${bible_id}&book_code=${book_code[i]}`,
+                method: 'GET',
+                beforeSend: function() {
+                    $('#btnFetch').attr('disabled', true);
+                    $('.progress-bar').css('width', '0%');
+                    // set text
+                    $('#btnFetch').html('<span class="spinner-border spinner-border-sm"></span> <span>Loading...</span>');
+                    // text progress
+                    $('.progress-bar').text('0%');
+                    // message
+                    $('#message').text('Book code: ' + book_code[i]);
+                },
+                success: function(data) {
+                    console.log(data);
+                    completedRequests++;
+                    let progress = ((completedRequests / totalRequests) * 100).toFixed(2);
+                    $('.progress-bar').css('width', progress + '%');
+                    $('.progress-bar').text(progress + '%');
+                    if (data.length > 0) {
+                        var html = '';
+                        data.forEach(function(item) {
+                            html += '<tr>';
+                            html += '<td>' + item.bible_id + '</td>';
+                            html += '<td>' + item.chapter_code + '</td>';
+                            html += '<td>' + item.verse_code + '</td>';
+                            html += '<td>' + item.label + '</td>';
+                            html += '<td>' + item.content + '</td>';
+                            html += '</tr>';
+                        });
+                        // get dataTable html
+                        var dataTable = $('#dataTable').html();
+                        // append html
+                        $('#dataTable').html(dataTable + html);
+                    }
+                    $('#btnFetch').attr('disabled', false);
+                    $('#btnFetch').text('Get Verse');
+                    // message
+                    if (progress == 100) {
+                        $('#message').text('Completed');
+                    } else {
+                        $('#message').text('Book code: ' + book_code[i]);
+                    }
+
+
                 }
-                $('#btnFetch').attr('disabled', false);
-                $('#btnFetch').html('Get Verse');
-            }
-        });
+            });
+        }
     }
 </script>
