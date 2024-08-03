@@ -1,6 +1,9 @@
 # Bible Craw
 
-Bible Craw là một dự án PHP để thu thập và quản lý dữ liệu Kinh Thánh từ nhiều nguồn khác nhau.
+Bible Craw là một dự án PHP để thu thập và quản lý dữ liệu Kinh Thánh từ  
+```sh
+    https://www.bible.com/
+```
 
 ## Yêu cầu hệ thống
 
