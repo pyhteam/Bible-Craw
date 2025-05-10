@@ -1,48 +1,45 @@
 <?php
 $languages = json_decode(file_get_contents('data/languages.json'));
-
-
 ?>
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bible Crawl</title>
-    <!-- bootstrap -->
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <!-- fontawesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css">
-    <!-- jquery -->
+    <title>Bible Crawl - bible.com</title>
+    <!-- Link to new Fluent UI CSS -->
+    <link rel="stylesheet" href="css/fluent-ui.css">
+    <!-- jQuery (still needed by pages for now, can be refactored later) -->
     <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <!-- Select2 (still needed by pages for now, can be refactored or replaced later) -->
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
-
 </head>
-
 <body>
-    <nav>
-        <ul class="nav justify-content-center">
-            <li class="nav-item">
-                <a class="nav-link active" href="/">Home</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="?page=crawl-bible">Crawl Bible</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="?page=crawl-verse">Crawl Verse</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" target="_blank" href="https://github.com/pyhteam/Bible-Craw">Github Project</a>
-            </li>
-        </ul>
-    </nav>
-    <main>
-        <div class="container">
-            <div class="row">
-               <?php 
-               $page = $_GET['page'] ?? '';
+    <div class="app-container">
+        <aside class="sidebar">
+            <h1 class="sidebar-title">Bible Crawl</h1>
+            <nav class="sidebar-nav">
+                <ul>
+                    <li><a href="/">Home (Crawl Bible)</a></li>
+                    <li><a href="?page=crawl-bible">Crawl Bible</a></li>
+                    <li><a href="?page=crawl-verse">Crawl Verse</a></li>
+                    <li><a href="https://github.com/pyhteam/Bible-Craw" target="_blank">Github Project</a></li>
+                </ul>
+            </nav>
+        </aside>
+
+        <main class="main-content">
+            <header class="main-header">
+                <!-- Placeholder for a top bar if needed, e.g., breadcrumbs or user info -->
+                <h2><?php 
+                    $page = $_GET['page'] ?? 'crawl-bible'; 
+                    echo ucwords(str_replace('-', ' ', $page)); 
+                ?></h2>
+            </header>
+            <div class="content-area">
+                <?php 
+                // $page variable is already defined above
                 switch ($page) {
                     case 'crawl-bible':
                         include 'pages/crawl-bible.php';
@@ -51,14 +48,15 @@ $languages = json_decode(file_get_contents('data/languages.json'));
                         include 'pages/crawl-verse.php';
                         break;
                     default:
-                        include 'pages/crawl-bible.php';
+                        include 'pages/crawl-bible.php'; // Default to crawl-bible
                         break;
                 }
                ?>
             </div>
-        </div>
-    </main>
-    
-</body>
+        </main>
+    </div>
 
+    <!-- Link to new Fluent App JS -->
+    <script src="js/fluent-app.js"></script>
+</body>
 </html>

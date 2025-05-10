@@ -1,0 +1,1138 @@
+/* Fluent UI Styles - Windows Store Inspired */
+
+:root {
+    --fluent-primary: #0078d4;
+    --fluent-primary-hover: #106ebe;
+    --fluent-primary-dark: #005a9e;
+    --fluent-black: #201f1e;
+    --fluent-dark-gray: #323130;
+    --fluent-neutral-gray: #605e5c;
+    --fluent-light-gray: #edebe9;
+    --fluent-white: #ffffff;
+    --fluent-success: #107c10;
+    --fluent-error: #d83b01;
+    --fluent-warning: #ffb900;
+    --fluent-info: #0078d4;
+    --sidebar-width-expanded: 280px;
+    --sidebar-width-collapsed: 70px;
+    --header-height: 60px;
+    --sidebar-transition: all 0.3s ease-in-out;
+    
+    /* Form element sizing */
+    --input-min-width: 250px;
+    --select-min-width: 250px;
+    --form-control-height: 42px;
+}
+
+/* Dark mode variables */
+.dark-mode {
+    --fluent-primary: #149eff;
+    --fluent-primary-hover: #2aabff;
+    --fluent-primary-dark: #0078d4;
+    --fluent-black: #ffffff;
+    --fluent-dark-gray: #e1dfdd;
+    --fluent-neutral-gray: #c8c6c4;
+    --fluent-light-gray: #3b3a39;
+    --fluent-white: #1f1f1f;
+    --fluent-success: #10b91a;
+    --fluent-error: #ff5630;
+    --fluent-warning: #ffcb40;
+    --fluent-info: #2aa3ff;
+    --sidebar-background: #2d2d2d;
+    --card-background: #2d2d2d;
+    --main-background: #1f1f1f;
+    --text-color: #ffffff;
+    --border-color: #444444;
+    --table-background: #2d2d2d;
+    --table-border: #444444;
+    --table-header-bg: #3d3d3d;
+    --input-background: #3d3d3d;
+    --input-border: #565656;
+    --input-text: #f0f0f0;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0;
+    background-color: #f5f5f5; /* Lighter background like Windows Store */
+    color: var(--fluent-black);
+    overflow-x: hidden;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.dark-mode body {
+    background-color: var(--main-background);
+    color: var(--text-color);
+}
+
+.app-container {
+    display: flex;
+    flex-grow: 1;
+    width: 100%;
+    height: 100vh; /* Use full viewport height */
+    overflow: hidden; /* Prevent scrolling on container */
+}
+
+/* Sidebar Styles - Windows Store Style */
+.sidebar {
+    width: var(--sidebar-width-expanded);
+    background-color: var(--fluent-white);
+    border-right: 1px solid rgba(0,0,0,0.05);
+    box-shadow: 0 0 15px rgba(0,0,0,0.05);
+    height: 100%;
+    position: fixed;
+    left: 0;
+    top: 0;
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    transition: var(--sidebar-transition);
+    overflow-x: hidden;
+    overflow-y: auto;
+}
+
+.dark-mode .sidebar {
+    background-color: var(--sidebar-background);
+    border-right: 1px solid var(--border-color);
+    box-shadow: 0 0 15px rgba(0,0,0,0.2);
+}
+
+.sidebar.collapsed {
+    width: var(--sidebar-width-collapsed);
+}
+
+.sidebar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+    border-bottom: 1px solid var(--fluent-light-gray);
+}
+
+.dark-mode .sidebar-header {
+    border-bottom: 1px solid var(--border-color);
+}
+
+.sidebar-title {
+    font-size: 1.4em;
+    color: var(--fluent-primary);
+    margin: 0;
+    font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    transition: var(--sidebar-transition);
+}
+
+.sidebar.collapsed .sidebar-title {
+    opacity: 0;
+    width: 0;
+}
+
+.sidebar-toggle {
+    background: none;
+    border: none;
+    color: var(--fluent-neutral-gray);
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.2s;
+    flex-shrink: 0;
+}
+
+.sidebar-toggle:hover {
+    background-color: var(--fluent-light-gray);
+    color: var(--fluent-primary);
+}
+
+.sidebar-toggle svg {
+    width: 16px;
+    height: 16px;
+    transition: transform 0.3s ease;
+}
+
+.sidebar.collapsed .sidebar-toggle svg {
+    transform: rotate(180deg);
+}
+
+.sidebar-nav {
+    padding: 20px 15px;
+    flex-grow: 1;
+}
+
+.sidebar-nav ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.sidebar-nav li {
+    margin-bottom: 5px;
+}
+
+.sidebar-nav-item {
+    display: flex;
+    align-items: center;
+    padding: 12px 15px;
+    color: var(--fluent-dark-gray);
+    text-decoration: none;
+    border-radius: 4px;
+    transition: background-color 0.2s, color 0.2s;
+    position: relative;
+    overflow: hidden;
+}
+
+.sidebar-nav-item:hover {
+    background-color: rgba(0,0,0,0.04);
+    color: var(--fluent-primary);
+}
+
+.dark-mode .sidebar-nav-item:hover {
+    background-color: rgba(255,255,255,0.05);
+}
+
+.sidebar-nav-item.active {
+    background-color: rgba(0,120,212,0.1);
+    color: var(--fluent-primary);
+    font-weight: 500;
+}
+
+.dark-mode .sidebar-nav-item.active {
+    background-color: rgba(20,158,255,0.15);
+}
+
+/* Add a subtle indicator for active items */
+.sidebar-nav-item.active::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    height: 100%;
+    width: 3px;
+    background-color: var(--fluent-primary);
+    opacity: 1;
+    transition: opacity 0.2s ease;
+}
+
+.sidebar-icon {
+    width: 20px;
+    height: 20px;
+    margin-right: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.sidebar-text {
+    white-space: nowrap;
+    opacity: 1;
+    transition: var(--sidebar-transition);
+}
+
+.sidebar.collapsed .sidebar-text {
+    opacity: 0;
+    width: 0;
+    margin-left: 0;
+}
+
+.sidebar.collapsed .sidebar-nav-item {
+    justify-content: center;
+    padding: 12px 0;
+}
+
+.sidebar.collapsed .sidebar-icon {
+    margin-right: 0;
+}
+
+/* Main Content Styles - Windows Store Style */
+.main-content {
+    flex-grow: 1;
+    margin-left: var(--sidebar-width-expanded);
+    transition: var(--sidebar-transition);
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow-x: hidden;
+}
+
+.main-content.sidebar-collapsed {
+    margin-left: var(--sidebar-width-collapsed);
+}
+
+.main-header {
+    height: var(--header-height);
+    background-color: var(--fluent-white);
+    border-bottom: 1px solid rgba(0,0,0,0.05);
+    display: flex;
+    align-items: center;
+    padding: 0 30px;
+    position: sticky;
+    top: 0;
+    z-index: 900;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    justify-content: space-between;
+}
+
+.dark-mode .main-header {
+    background-color: var(--sidebar-background);
+    border-bottom: 1px solid var(--border-color);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+}
+
+.main-header h2 {
+    margin: 0;
+    font-size: 1.4em;
+    font-weight: 600;
+    color: var(--fluent-black);
+}
+
+.theme-toggle {
+    background: none;
+    border: none;
+    color: var(--fluent-neutral-gray);
+    cursor: pointer;
+    padding: 10px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.2s;
+}
+
+.theme-toggle:hover {
+    background-color: rgba(0,0,0,0.04);
+    color: var(--fluent-primary);
+}
+
+.dark-mode .theme-toggle:hover {
+    background-color: rgba(255,255,255,0.05);
+}
+
+.content-area {
+    padding: 30px;
+    flex-grow: 1;
+    overflow-y: auto;
+    background-color: #f5f5f5; /* Windows Store background color */
+    transition: background-color 0.3s ease;
+}
+
+.dark-mode .content-area {
+    background-color: var(--main-background);
+}
+
+/* Page container for content */
+.page-container {
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+/* Basic Element Styling - Windows Store Style */
+h1, h2, h3, h4, h5, h6 {
+    color: var(--fluent-black);
+    margin-top: 0.8em;
+    margin-bottom: 0.5em;
+    font-weight: 600;
+    line-height: 1.3;
+}
+h1 { font-size: 2rem; } 
+h2 { font-size: 1.8rem; }
+h3 { font-size: 1.5rem; }
+h4 { font-size: 1.3rem; }
+h5 { font-size: 1.1rem; }
+h6 { font-size: 1rem; }
+
+.content-title {
+    font-size: 1.8rem;
+    font-weight: 600;
+    margin-bottom: 1.5rem;
+    color: var(--fluent-black);
+}
+
+p {
+    line-height: 1.6;
+    margin-bottom: 1em;
+    color: var(--fluent-dark-gray);
+}
+
+a {
+    color: var(--fluent-primary);
+    text-decoration: none;
+}
+a:hover {
+    text-decoration: underline;
+}
+
+/* Form Elements - Authentic Fluent UI Style */
+.form-group {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 20px;
+    width: 100%;
+    position: relative;
+}
+
+.form-group label {
+    margin-bottom: 6px;
+    font-weight: 400;
+    color: var(--fluent-dark-gray);
+    font-size: 14px;
+    display: block;
+    width: 100%;
+}
+
+/* Authentic Fluent UI Form Controls */
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="number"],
+select,
+textarea {
+    height: 32px;
+    padding: 0 12px;
+    border: 1px solid #8a8886;
+    border-radius: 2px;
+    background-color: var(--fluent-white);
+    color: var(--fluent-black);
+    font-size: 14px;
+    line-height: 1;
+    transition: all 0.1s ease;
+    font-family: 'Segoe UI', sans-serif;
+    box-sizing: border-box;
+    width: 100%;
+    min-width: var(--input-min-width);
+    outline: none;
+    display: block;
+}
+
+textarea {
+    height: auto;
+    min-height: 80px;
+    padding: 8px 12px;
+    line-height: 1.5;
+}
+
+/* Hover state */
+input[type="text"]:hover,
+input[type="email"]:hover,
+input[type="password"]:hover,
+input[type="number"]:hover,
+select:hover,
+textarea:hover {
+    border-color: #323130;
+}
+
+/* Focus state with animation */
+input[type="text"]:focus,
+input[type="email"]:focus,
+input[type="password"]:focus,
+input[type="number"]:focus,
+select:focus,
+textarea:focus {
+    border-color: var(--fluent-primary);
+    box-shadow: 0 0 0 1px var(--fluent-primary);
+    outline: none;
+}
+
+/* Disabled state */
+input[type="text"]:disabled,
+input[type="email"]:disabled,
+input[type="password"]:disabled,
+input[type="number"]:disabled,
+select:disabled,
+textarea:disabled {
+    background-color: #f3f2f1;
+    border-color: #c8c6c4;
+    color: #a19f9d;
+    cursor: not-allowed;
+}
+
+/* Placeholder styling */
+input::placeholder,
+textarea::placeholder {
+    color: #a19f9d;
+    opacity: 1;
+}
+
+/* Dark Mode Form Controls */
+.dark-mode input[type="text"],
+.dark-mode input[type="email"],
+.dark-mode input[type="password"],
+.dark-mode input[type="number"],
+.dark-mode select,
+.dark-mode textarea {
+    background-color: #333333;
+    border-color: #666666;
+    color: #f3f2f1;
+}
+
+.dark-mode input[type="text"]:hover,
+.dark-mode input[type="email"]:hover,
+.dark-mode input[type="password"]:hover,
+.dark-mode input[type="number"]:hover,
+.dark-mode select:hover,
+.dark-mode textarea:hover {
+    border-color: #999999;
+}
+
+.dark-mode input[type="text"]:focus,
+.dark-mode input[type="email"]:focus,
+.dark-mode input[type="password"]:focus,
+.dark-mode input[type="number"]:focus,
+.dark-mode select:focus,
+.dark-mode textarea:focus {
+    border-color: var(--fluent-primary);
+    box-shadow: 0 0 0 1px var(--fluent-primary);
+}
+
+.dark-mode input[type="text"]:disabled,
+.dark-mode input[type="email"]:disabled,
+.dark-mode input[type="password"]:disabled,
+.dark-mode input[type="number"]:disabled,
+.dark-mode select:disabled,
+.dark-mode textarea:disabled {
+    background-color: #3c3c3c;
+    border-color: #666666;
+    color: #888888;
+}
+
+.dark-mode input::placeholder,
+.dark-mode textarea::placeholder {
+    color: #888888;
+}
+
+/* Select element with authentic Fluent UI styling */
+select {
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23323130' d='M6 8.825L2.162 4.5 3.087 3.625 6 6.85 8.913 3.625 9.838 4.5z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    padding-right: 30px;
+}
+
+.dark-mode select {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23f3f2f1' d='M6 8.825L2.162 4.5 3.087 3.625 6 6.85 8.913 3.625 9.838 4.5z'/%3E%3C/svg%3E");
+}
+
+/* Consistent form control sizes */
+.form-control-sm {
+    height: 24px;
+    font-size: 12px;
+    padding: 0 8px;
+}
+
+.form-control-md {
+    height: 32px;
+    font-size: 14px;
+    padding: 0 12px;
+}
+
+.form-control-lg {
+    height: 40px;
+    font-size: 16px;
+    padding: 0 16px;
+}
+
+/* Select2 Overrides - Authentic Fluent UI Style */
+.select2-container {
+    display: block;
+    width: 100% !important;
+    min-width: var(--select-min-width);
+    margin-bottom: 0;
+}
+
+.select2-container .select2-selection--single {
+    height: 32px;
+    border: 1px solid #8a8886;
+    border-radius: 2px;
+    background-color: var(--fluent-white);
+    transition: all 0.1s ease;
+    display: flex;
+    align-items: center;
+}
+
+.select2-container .select2-selection--multiple {
+    min-height: 32px;
+    border: 1px solid #8a8886;
+    border-radius: 2px;
+    background-color: var(--fluent-white);
+    transition: all 0.1s ease;
+}
+
+/* Hover states */
+.select2-container .select2-selection--single:hover,
+.select2-container .select2-selection--multiple:hover {
+    border-color: #323130;
+}
+
+.dark-mode .select2-container .select2-selection--single,
+.dark-mode .select2-container .select2-selection--multiple {
+    background-color: #333333;
+    border-color: #666666;
+}
+
+.dark-mode .select2-container .select2-selection--single:hover,
+.dark-mode .select2-container .select2-selection--multiple:hover {
+    border-color: #999999;
+}
+
+.select2-container--default .select2-selection--single .select2-selection__rendered {
+    color: var(--fluent-black);
+    line-height: 32px;
+    padding-left: 12px;
+    padding-right: 30px;
+    font-size: 14px;
+}
+
+.dark-mode .select2-container--default .select2-selection--single .select2-selection__rendered {
+    color: #f3f2f1;
+}
+
+.select2-container--default .select2-selection--single .select2-selection__arrow {
+    height: 32px;
+    width: 30px;
+    position: absolute;
+    right: 0;
+    top: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.select2-container--default .select2-selection--single .select2-selection__arrow b {
+    border-color: #323130 transparent transparent transparent;
+    border-width: 5px 5px 0 5px;
+}
+
+.dark-mode .select2-container--default .select2-selection--single .select2-selection__arrow b {
+    border-color: #f3f2f1 transparent transparent transparent;
+}
+
+.select2-container--default.select2-container--open .select2-selection--single .select2-selection__arrow b {
+    border-color: transparent transparent #323130 transparent;
+    border-width: 0 5px 5px 5px;
+}
+
+.dark-mode .select2-container--default.select2-container--open .select2-selection--single .select2-selection__arrow b {
+    border-color: transparent transparent #f3f2f1 transparent;
+}
+
+/* Focus states */
+.select2-container--default.select2-container--focus .select2-selection--single,
+.select2-container--default.select2-container--focus .select2-selection--multiple,
+.select2-container--default.select2-container--open .select2-selection--single,
+.select2-container--default.select2-container--open .select2-selection--multiple {
+    border-color: var(--fluent-primary);
+    box-shadow: 0 0 0 1px var(--fluent-primary);
+}
+
+/* Dropdown styling */
+.select2-dropdown {
+    border: 1px solid var(--fluent-primary);
+    border-radius: 2px;
+    box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+}
+
+.dark-mode .select2-dropdown {
+    background-color: #333333;
+    border-color: var(--fluent-primary);
+}
+
+.select2-container--open .select2-dropdown {
+    margin-top: 1px;
+}
+
+.select2-container--default .select2-search--dropdown .select2-search__field {
+    border: 1px solid #8a8886;
+    border-radius: 2px;
+    height: 32px;
+    padding: 0 10px;
+    font-size: 14px;
+}
+
+.dark-mode .select2-container--default .select2-search--dropdown .select2-search__field {
+    background-color: #333333;
+    border-color: #666666;
+    color: #f3f2f1;
+}
+
+.select2-results__option {
+    padding: 8px 12px;
+    font-size: 14px;
+    transition: background-color 0.1s ease;
+}
+
+.dark-mode .select2-results__option {
+    color: #f3f2f1;
+}
+
+.select2-container--default .select2-results__option--highlighted[aria-selected] {
+    background-color: #f3f2f1;
+    color: var(--fluent-black);
+}
+
+.dark-mode .select2-container--default .select2-results__option--highlighted[aria-selected] {
+    background-color: #505050;
+    color: #f3f2f1;
+}
+
+.select2-container--default .select2-results__option[aria-selected=true] {
+    background-color: var(--fluent-primary);
+    color: white;
+}
+
+/* Multiple selection styling */
+.select2-container--default .select2-selection--multiple {
+    padding: 0 4px;
+}
+
+.select2-container--default .select2-selection--multiple .select2-selection__rendered {
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+.select2-container--default .select2-selection--multiple .select2-selection__choice {
+    background-color: #f3f2f1;
+    color: var(--fluent-black);
+    border: 1px solid #8a8886;
+    border-radius: 2px;
+    padding: 0 8px;
+    height: 24px;
+    margin: 4px;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+}
+
+.dark-mode .select2-container--default .select2-selection--multiple .select2-selection__choice {
+    background-color: #505050;
+    color: #f3f2f1;
+    border-color: #666666;
+}
+
+.select2-container--default .select2-selection--multiple .select2-selection__choice__remove {
+    color: #323130;
+    margin-right: 5px;
+}
+
+.dark-mode .select2-container--default .select2-selection--multiple .select2-selection__choice__remove {
+    color: #f3f2f1;
+}
+
+.select2-container--default .select2-selection--multiple .select2-selection__choice__remove:hover {
+    color: var(--fluent-error);
+}
+
+/* Card Styling - Windows Store Style */
+.card {
+    background-color: var(--fluent-white);
+    border-radius: 6px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    padding: 25px;
+    margin-bottom: 30px;
+    border: 1px solid rgba(0,0,0,0.05);
+    transition: box-shadow 0.3s, background-color 0.3s;
+}
+
+.dark-mode .card {
+    background-color: var(--card-background);
+    border: 1px solid var(--border-color);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+}
+
+.card:hover {
+    box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+}
+
+.dark-mode .card:hover {
+    box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+}
+
+.card-title {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: var(--fluent-black);
+    margin-top: 0;
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid var(--fluent-light-gray);
+}
+
+.dark-mode .card-title {
+    border-bottom: 1px solid var(--border-color);
+}
+
+.card-section {
+    margin-bottom: 25px;
+}
+
+.card-section-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 15px;
+    color: var(--fluent-black);
+}
+
+/* Table Styling - Windows Store Style */
+.table-container {
+    margin: 20px 0;
+    border-radius: 6px;
+    overflow: hidden;
+    box-shadow: 0 0 10px rgba(0,0,0,0.05);
+}
+
+.dark-mode .table-container {
+    box-shadow: 0 0 10px rgba(0,0,0,0.15);
+}
+
+.table-responsive {
+    overflow-x: auto;
+    width: 100%;
+    border-radius: 6px;
+    background-color: var(--fluent-white);
+}
+
+.dark-mode .table-responsive {
+    background-color: var(--table-background);
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: var(--fluent-white);
+}
+
+.dark-mode table {
+    background-color: var(--table-background);
+}
+
+th, td {
+    padding: 16px;
+    text-align: left;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.dark-mode th, 
+.dark-mode td {
+    border-bottom: 1px solid var(--table-border);
+}
+
+thead th {
+    background-color: #fafafa;
+    font-weight: 600;
+    color: var(--fluent-dark-gray);
+    border-bottom: 2px solid #f0f0f0;
+    white-space: nowrap;
+}
+
+.dark-mode thead th {
+    background-color: var(--table-header-bg);
+    border-bottom: 2px solid var(--table-border);
+}
+
+tbody tr:hover {
+    background-color: rgba(0, 120, 212, 0.03);
+}
+
+.dark-mode tbody tr:hover {
+    background-color: rgba(20, 158, 255, 0.05);
+}
+
+tbody tr:last-child td {
+    border-bottom: none;
+}
+
+/* Progress Bar - Windows Store Style */
+.progress-section {
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+
+.progress-section label {
+    display: block;
+    margin-bottom: 10px;
+    font-size: 0.9rem;
+    color: var(--fluent-dark-gray);
+}
+
+.progress {
+    height: 6px;
+    background-color: #f0f0f0;
+    border-radius: 3px;
+    overflow: hidden;
+    margin-bottom: 15px;
+}
+
+.dark-mode .progress {
+    background-color: #444444;
+}
+
+.progress-bar {
+    height: 100%;
+    background-color: var(--fluent-primary);
+    border-radius: 3px;
+    transition: width 0.3s ease;
+    position: relative;
+    text-indent: -9999px; /* Hide text, we'll show it above the bar instead */
+}
+
+.progress-info {
+    font-size: 0.8rem;
+    color: var(--fluent-dark-gray);
+    text-align: right;
+    margin-top: 5px;
+}
+
+/* Spinners and Loaders */
+.spinner {
+    display: inline-block;
+    width: 1em;
+    height: 1em;
+    border: 2px solid currentColor;
+    border-right-color: transparent;
+    border-radius: 50%;
+    animation: spinner-border .75s linear infinite;
+    margin-right: 8px;
+    vertical-align: text-bottom;
+}
+
+@keyframes spinner-border {
+    to { transform: rotate(360deg); }
+}
+
+/* Utility Classes */
+.mb-2 { margin-bottom: 0.5rem !important; }
+.mb-3 { margin-bottom: 1rem !important; }
+.mt-3 { margin-top: 1rem !important; }
+.mt-5 { margin-top: 3rem !important; }
+.text-center { text-align: center !important; }
+.text-right { text-align: right !important; }
+
+.row {
+    display: flex;
+    flex-wrap: wrap;
+    margin-left: -15px;
+    margin-right: -15px;
+    width: 100%;
+}
+
+.col-md-3, .col-md-4, .col-md-6, .col-md-12 {
+    position: relative;
+    width: 100%;
+    padding-right: 15px;
+    padding-left: 15px;
+    box-sizing: border-box;
+    margin-bottom: 15px;
+}
+
+/* Ensure full width on mobile first */
+.col-12 {
+    flex: 0 0 100%;
+    max-width: 100%;
+}
+
+@media (min-width: 768px) { 
+    .col-md-3 { flex: 0 0 25%; max-width: 25%; }
+    .col-md-4 { flex: 0 0 33.333333%; max-width: 33.333333%; }
+    .col-md-6 { flex: 0 0 50%; max-width: 50%; }
+    .col-md-12 { flex: 0 0 100%; max-width: 100%; }
+    
+    /* For specific layouts that need horizontal arrangement */
+    .form-layout-horizontal {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 20px;
+    }
+}
+
+/* Button Styling - Windows Store Style */
+button, 
+input[type="button"], 
+input[type="submit"] {
+    background-color: var(--fluent-primary);
+    color: white;
+    padding: 12px 24px;
+    border: none;
+    border-radius: 4px;
+    font-size: 0.95rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    text-align: center;
+    display: inline-block;
+    font-family: 'Segoe UI', sans-serif;
+}
+
+button:hover, 
+input[type="button"]:hover, 
+input[type="submit"]:hover {
+    background-color: var(--fluent-primary-hover);
+}
+
+button:active, 
+input[type="button"]:active, 
+input[type="submit"]:active {
+    background-color: var(--fluent-primary-dark);
+}
+
+button:disabled, 
+input[type="button"]:disabled, 
+input[type="submit"]:disabled {
+    background-color: #c8c6c4;
+    cursor: not-allowed;
+}
+
+.dark-mode button:disabled, 
+.dark-mode input[type="button"]:disabled, 
+.dark-mode input[type="submit"]:disabled {
+    background-color: #505050;
+    color: #a0a0a0;
+}
+
+.button-group {
+    display: flex;
+    gap: 10px;
+}
+
+/* Scrollbar Styling for Windows Store Look */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f5f5f5;
+}
+
+.dark-mode ::-webkit-scrollbar-track {
+    background: #2d2d2d;
+}
+
+::-webkit-scrollbar-thumb {
+    background-color: #c8c6c4;
+    border-radius: 20px;
+}
+
+.dark-mode ::-webkit-scrollbar-thumb {
+    background-color: #505050;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background-color: #a19f9d;
+}
+
+.dark-mode ::-webkit-scrollbar-thumb:hover {
+    background-color: #707070;
+}
+
+/* Toastr Notifications */
+.toastr-container {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 9999;
+    width: 380px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.toast {
+    background-color: var(--fluent-white);
+    color: var(--fluent-black);
+    padding: 15px 20px;
+    border-radius: 6px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+    display: flex;
+    align-items: flex-start;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    border-left: 4px solid var(--fluent-info);
+}
+
+.dark-mode .toast {
+    background-color: var(--card-background);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+}
+
+.toast.show {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.toast-icon {
+    margin-right: 15px;
+    font-size: 1.1em;
+    line-height: 1.2;
+    color: var(--fluent-primary);
+}
+
+.toast-content {
+    flex-grow: 1;
+}
+
+.toast-title {
+    font-weight: 600;
+    margin-bottom: 5px;
+    color: var(--fluent-black);
+}
+
+.toast-message {
+    font-size: 0.9em;
+    line-height: 1.4;
+    color: var(--fluent-dark-gray);
+}
+
+.toast-close {
+    background: none;
+    border: none;
+    color: var(--fluent-neutral-gray);
+    font-size: 1.2em;
+    cursor: pointer;
+    opacity: 0.7;
+    margin-left: 15px;
+    padding: 0;
+    align-self: flex-start;
+}
+
+.toast-close:hover {
+    opacity: 1;
+    color: var(--fluent-dark-gray);
+}
+
+.toast.success {
+    border-left-color: var(--fluent-success);
+}
+.toast.success .toast-icon {
+    color: var(--fluent-success);
+}
+
+.toast.error {
+    border-left-color: var(--fluent-error);
+}
+.toast.error .toast-icon {
+    color: var(--fluent-error);
+}
+
+.toast.warning {
+    border-left-color: var(--fluent-warning);
+}
+.toast.warning .toast-icon {
+    color: var(--fluent-warning);
+}
+
+.toast.info {
+    border-left-color: var(--fluent-info);
+}
+.toast.info .toast-icon {
+    color: var(--fluent-info);
+} 
