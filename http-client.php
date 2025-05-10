@@ -85,4 +85,9 @@ class HttpClient
 
         return $e->getMessage();
     }
+
+    public function getGuzzleClient()
+    {
+        return $this->client;
+    }
 }

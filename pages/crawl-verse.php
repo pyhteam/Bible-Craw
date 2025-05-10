@@ -16,6 +16,10 @@
                         <select class="form-control" id="book">
                         </select>
                     </div>
+                    <!-- Dynamic ID input -->
+                    <div class="col-md-3">
+                        <input type="text" class="form-control" id="dynamicId" placeholder="Enter Dynamic ID">
+                    </div>
                     <!-- button -->
                     <button class="btn btn-primary" onclick="fetchVerse()" id="btnFetch">Get Verse</button>
                 </div>
@@ -113,76 +117,88 @@
 
     function fetchVerse() {
         var bible_id = $('#bible').val();
-        $('#dataTable').html('');
-        var book_code = [];
+        var dynamicId = $('#dynamicId').val(); // Get the dynamic ID
+
+        if (!bible_id) {
+            alert('Please select a Bible.');
+            return;
+        }
+        if (!dynamicId) {
+            alert('Please enter the Dynamic ID.');
+            return;
+        }
+
+        $('#dataTable').html(''); // Clear previous results
+        var book_codes_to_fetch = [];
 
         // Check select all
-        let all = $('#book').val();
-        if (all.includes('ALL')) {
-            var books = JSON.parse(localStorage.getItem('books'));
-            books.forEach(function(item) {
-                book_code.push(item.code);
-            });
-            console.log(book_code);
-        } else {
-            $('#book option:selected').each(function() {
-                book_code.push($(this).val());
+        let all_selected_books = $('#book').val();
+        if (all_selected_books && all_selected_books.includes('ALL')) {
+            var books_from_storage = JSON.parse(localStorage.getItem('books'));
+            if (books_from_storage) {
+                books_from_storage.forEach(function(item) {
+                    book_codes_to_fetch.push(item.code);
+                });
+            }
+        } else if (all_selected_books) {
+            all_selected_books.forEach(function(book_code) {
+                book_codes_to_fetch.push(book_code);
             });
         }
 
-        var verses = [];
-        var completedRequests = 0;
-        const totalRequests = book_code.length;
+        if (book_codes_to_fetch.length === 0) {
+            alert('Please select at least one book.');
+            return;
+        }
 
-        for (let i = 0; i < totalRequests; i++) {
-            // using ajax  
-            $.ajax({
-                url: `api/build-verse.php?bible_id=${bible_id}&book_code=${book_code[i]}`,
+        var totalRequests = book_codes_to_fetch.length;
+        var completedRequests = 0;
+
+        $('#btnFetch').attr('disabled', true).html('<span class="spinner-border spinner-border-sm"></span> <span>Loading...</span>');
+        $('.progress-bar').css('width', '0%').text('0%');
+        $('#message').text('Starting to fetch ' + totalRequests + ' book(s)...');
+        
+        var promises = book_codes_to_fetch.map(function(book_code) {
+            return $.ajax({
+                url: `api/build-verse.php?bible_id=${bible_id}&book_code=${book_code}&dynamic_id=${dynamicId}`,
                 method: 'GET',
                 beforeSend: function() {
-                    $('#btnFetch').attr('disabled', true);
-                    $('.progress-bar').css('width', '0%');
-                    // set text
-                    $('#btnFetch').html('<span class="spinner-border spinner-border-sm"></span> <span>Loading...</span>');
-                    // text progress
-                    $('.progress-bar').text('0%');
-                    // message
-                    $('#message').text('Book code: ' + book_code[i]);
-                },
-                success: function(data) {
-                    console.log(data);
-                    completedRequests++;
-                    let progress = ((completedRequests / totalRequests) * 100).toFixed(2);
-                    $('.progress-bar').css('width', progress + '%');
-                    $('.progress-bar').text(progress + '%');
-                    if (data.length > 0) {
-                        var html = '';
-                        data.forEach(function(item) {
-                            html += '<tr>';
-                            html += '<td>' + item.bible_id + '</td>';
-                            html += '<td>' + item.chapter_code + '</td>';
-                            html += '<td>' + item.verse_code + '</td>';
-                            html += '<td>' + item.label + '</td>';
-                            html += '<td>' + item.content + '</td>';
-                            html += '</tr>';
-                        });
-                        // get dataTable html
-                        var dataTable = $('#dataTable').html();
-                        // append html
-                        $('#dataTable').html(dataTable + html);
-                    }
-                    $('#btnFetch').attr('disabled', false);
-                    $('#btnFetch').text('Get Verse');
-                    // message
-                    if (progress == 100) {
-                        $('#message').text('Completed');
-                    } else {
-                        $('#message').text('Book code: ' + book_code[i]);
-                    }
-
-
+                    // Message could be updated here per-request if desired, but global progress is main focus
+                    // $('#message').text('Fetching book code: ' + book_code); 
                 }
+            }).done(function(data) {
+                if (data && data.length > 0) {
+                    var html = '';
+                    data.forEach(function(item) {
+                        html += '<tr>';
+                        html += '<td>' + item.bible_id + '</td>';
+                        html += '<td>' + item.chapter_code + '</td>';
+                        html += '<td>' + item.verse_code + '</td>';
+                        html += '<td>' + item.label + '</td>';
+                        html += '<td>' + item.content + '</td>';
+                        html += '</tr>';
+                    });
+                    // Append results as they come in
+                    $('#dataTable').append(html);
+                }
+            }).fail(function(jqXHR, textStatus, errorThrown) {
+                console.error(`Failed to fetch book ${book_code}: ${textStatus}`, errorThrown);
+                $('#dataTable').append(`<tr><td colspan="5">Error fetching book ${book_code}: ${textStatus}</td></tr>`);
+            }).always(function() {
+                completedRequests++;
+                let progress = ((completedRequests / totalRequests) * 100).toFixed(2);
+                $('.progress-bar').css('width', progress + '%').text(progress + '%');
+                $('#message').text(`Fetched ${completedRequests} of ${totalRequests} books. Last processed: ${book_code}`);
             });
-        }
+        });
+
+        Promise.allSettled(promises).then(function(results) {
+            $('#btnFetch').attr('disabled', false).text('Get Verse');
+            let successful_fetches = results.filter(r => r.status === 'fulfilled' && r.value && r.value.length > 0).length;
+            $('#message').text(`All ${totalRequests} book requests processed. ${successful_fetches} fetched successfully.`);
+            if (completedRequests === totalRequests) {
+                 // Final check
+            }
+        });
     }
 </script>
