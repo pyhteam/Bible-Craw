@@ -14,6 +14,8 @@ $languages = json_decode(file_get_contents('data/languages.json'));
     <!-- Select2 (still needed by pages for now, can be refactored or replaced later) -->
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" />
 </head>
 <body>
     <div class="app-container">
@@ -24,6 +26,7 @@ $languages = json_decode(file_get_contents('data/languages.json'));
                     <li><a href="/">Home (Crawl Bible)</a></li>
                     <li><a href="?page=crawl-bible">Crawl Bible</a></li>
                     <li><a href="?page=crawl-verse">Crawl Verse</a></li>
+                    <li><a href="?page=manage-bibles">Quản lý Kinh Thánh</a></li>
                     <li><a href="https://github.com/pyhteam/Bible-Craw" target="_blank">Github Project</a></li>
                 </ul>
             </nav>
@@ -46,6 +49,9 @@ $languages = json_decode(file_get_contents('data/languages.json'));
                         break;
                     case 'crawl-verse':
                         include 'pages/crawl-verse.php';
+                        break;
+                    case 'manage-bibles':
+                        include 'pages/manage-bibles.php';
                         break;
                     default:
                         include 'pages/crawl-bible.php'; // Default to crawl-bible

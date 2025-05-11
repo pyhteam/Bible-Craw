@@ -1,1 +1,31 @@
-{"id":81,"language_code":"jpn","code":"JA1955","name":"Colloquial Japanese (1955)","name_en":"Colloquial Japanese (1955)","publisher":null,"copyright_long":{"text":null,"html":null},"copyright_short":{"text":null,"html":null},"language":{"iso_639_1":"ja","iso_639_3":"jpn","name":"Japanese","local_name":"\u65e5\u672c\u8a9e","text_direction":"ltr","language_tag":"jpn","secondary_language_tags":null},"audio":false,"audio_count":0}
+{
+    "id": 81,
+    "language_code": "jpn",
+    "code": "JA1955",
+    "name": "Colloquial Japanese (1955)",
+    "name_en": "Colloquial Japanese (1955)",
+    "publisher": null,
+    "copyright_long": {
+        "text": null,
+        "html": null
+    },
+    "copyright_short": {
+        "text": null,
+        "html": null
+    },
+    "language": {
+        "iso_639_1": "ja",
+        "iso_639_3": "jpn",
+        "name": "Japanese",
+        "local_name": "\u65e5\u672c\u8a9e",
+        "text_direction": "ltr",
+        "language_tag": "jpn",
+        "secondary_language_tags": null
+    },
+    "audio": false,
+    "audio_count": 0,
+    "book_count": 66,
+    "verse_count": 31086,
+    "size_bytes": 13385648,
+    "last_updated": "2025-05-11 08:49:46"
+}

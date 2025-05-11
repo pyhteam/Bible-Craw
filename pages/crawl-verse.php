@@ -2,6 +2,11 @@
     <h3 class="mt-5 text-center">Lấy chi tiết câu Kinh Thánh</h3>
     <div class="mt-3 text-center">
         <div class="card">
+            <div class="management-link text-right mb-2">
+                <a href="?page=manage-bibles" class="btn-link">
+                    <i class="fas fa-cog"></i> Quản lý Kinh Thánh đã tải
+                </a>
+            </div>
             <h5 class="card-title">Lọc và lấy dữ liệu</h5>
             <div class="form-layout">
                 <div class="form-group">
@@ -152,6 +157,41 @@
     padding: 6px 12px;
     font-size: 14px;
 }
+
+.progress-bar {
+    height: 100%;
+    background-color: var(--fluent-primary);
+    width: 0;
+    transition: width 0.3s;
+}
+
+.highlight-card {
+    animation: highlight-pulse 1.5s ease-in-out;
+    box-shadow: 0 0 20px rgba(0, 120, 215, 0.5);
+}
+
+@keyframes highlight-pulse {
+    0% { box-shadow: 0 0 0 rgba(0, 120, 215, 0); }
+    50% { box-shadow: 0 0 20px rgba(0, 120, 215, 0.8); }
+    100% { box-shadow: 0 0 0 rgba(0, 120, 215, 0); }
+}
+
+.management-link {
+    padding: 0 20px;
+    text-align: right;
+}
+
+.btn-link {
+    color: var(--fluent-primary);
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.2s;
+}
+
+.btn-link:hover {
+    color: var(--fluent-primary-dark);
+    text-decoration: underline;
+}
 </style>
 
 <script>
@@ -191,6 +231,9 @@
         
         // Load bibles
         fetchBible();
+        
+        // Check for pre-selected Bible and books from the Bible management page
+        checkForPreselections();
     });
 
     function initTableControls() {
@@ -436,6 +479,11 @@
     
     function processNextBook() {
         if (processingQueue.length === 0 || isPaused || isCancelled) {
+            // If cancelled and no running processes, ensure finalization if not already handled.
+            if (isCancelled && runningProcesses === 0 && intervalId) {
+                 // intervalId check ensures finalizeProcess hasn't run yet from updateStats
+                finalizeProcess();
+            }
             return;
         }
         
@@ -477,15 +525,28 @@
                     pendingAjaxRequests.splice(index, 1);
                 }
                 
-                // If not paused or cancelled, process more
-                if (!isPaused && !isCancelled) {
-                    // Process next book if available
-                    if (processingQueue.length > 0) {
-                        processNextBook();
-                    } else if (runningProcesses === 0) {
-                        // All processing completed
+                if (isCancelled) {
+                    // If cancelled, and no more requests are running, finalize.
+                    // intervalId check ensures finalizeProcess hasn't run from updateStats or another callback
+                    if (runningProcesses === 0 && intervalId) {
                         finalizeProcess();
                     }
+                    return; // Do not start new processes if cancelled.
+                }
+
+                if (isPaused) {
+                    // If paused, do not start new processes.
+                    // updateStats will continue to reflect the current state.
+                    // If everything is done and paused, it will just wait for resume or cancel.
+                    return;
+                }
+                
+                // If not paused or cancelled, process more
+                if (processingQueue.length > 0) {
+                    processNextBook(); // Process next in queue
+                } else if (runningProcesses === 0) {
+                    // Queue is empty and this was the last running process
+                    finalizeProcess();
                 }
             }
         });
@@ -523,27 +584,48 @@
     function finalizeProcess() {
         if (intervalId) {
             clearInterval(intervalId);
-            intervalId = null;
+            intervalId = null; // Ensure it's cleared to prevent multiple calls
+        } else {
+            // If intervalId is already null, finalizeProcess might have been called.
+            // This can happen if cancellation occurs very close to natural completion.
+            // We can add a flag to ensure it only runs once if needed, but clearing intervalId is key.
+            return; 
         }
         
         const totalTime = ((performance.now() - startTime) / 1000).toFixed(1);
-        const totalBooks = successCount + failCount;
         
-        // Update final stats
-        $('#message').text(`Hoàn tất ${totalBooks} yêu cầu. ${successCount} Sách được lấy thành công, ${failCount} thất bại.`);
-        $('#timeStats').text(`Tổng thời gian: ${totalTime}s | Tốc độ trung bình: ${(totalBooks / (totalTime / 60)).toFixed(1)} sách/phút`);
-        
-        // Reset UI
-        resetProcessUI();
-        
-        // Show completion toast
-        if (successCount > 0) {
-            showToast('Hoàn tất', `Đã lấy thành công dữ liệu cho ${successCount} sách trong ${totalTime} giây.`, 'success');
-        } else if (totalBooks > 0) {
-            showToast('Hoàn tất với lỗi', `Không thể lấy dữ liệu cho bất kỳ sách nào trong số ${totalBooks} yêu cầu.`, 'warning');
+        if (isCancelled) {
+            $('#message').text(`Quá trình xử lý đã bị hủy. Đã cố gắng xử lý ${totalProcessed} sách.`);
+            $('#timeStats').text(`Thời gian hoạt động: ${totalTime}s`);
+            // Toast for cancellation is already handled by the cancel button's event handler
         } else {
-            showToast('Thông tin', 'Không có yêu cầu nào được xử lý.', 'info');
+            const totalBooksProcessedActually = successCount + failCount; // Books that returned a definitive success/fail
+            let messageText;
+
+            if (totalProcessed === 0) {
+                messageText = 'Không có yêu cầu nào được xử lý.';
+            } else if (successCount === 0 && failCount === 0 && totalProcessed > 0) {
+                 messageText = `Đã xử lý ${totalProcessed} sách. Không có dữ liệu câu nào được trả về hoặc các sách không chứa câu.`;
+            }
+            else {
+                 messageText = `Hoàn tất ${totalProcessed} yêu cầu. ${successCount} Sách được lấy thành công, ${failCount} thất bại.`;
+            }
+            
+            $('#message').text(messageText);
+            $('#timeStats').text(`Tổng thời gian: ${totalTime}s | Tốc độ trung bình: ${(totalBooksProcessedActually > 0 && totalTime > 0 ? (totalBooksProcessedActually / (totalTime / 60)) : 0).toFixed(1)} sách/phút`);
+            
+            if (successCount > 0) {
+                showToast('Hoàn tất', `Đã lấy thành công dữ liệu cho ${successCount} sách trong ${totalTime} giây.`, 'success');
+            } else if (failCount > 0) {
+                showToast('Hoàn tất với lỗi', `Xử lý ${totalProcessed} sách hoàn tất với ${failCount} lỗi và ${successCount} thành công.`, 'warning');
+            } else if (totalProcessed > 0) { // Processed some, but no explicit success/fail (e.g., all returned empty arrays correctly)
+                showToast('Hoàn tất', `Đã xử lý ${totalProcessed} sách. Không có dữ liệu câu nào được tìm thấy hoặc có lỗi không xác định.`, 'info');
+            } else { // No books processed at all
+                showToast('Thông tin', 'Không có yêu cầu nào được xử lý.', 'info');
+            }
         }
+        
+        resetProcessUI();
     }
     
     function resetProcessUI() {
@@ -620,6 +702,75 @@
         } else {
             console.log(`${type.toUpperCase()}: ${title} - ${message}`);
             alert(`${title}: ${message}`);
+        }
+    }
+
+    // Function to check for pre-selected values from Bible management
+    function checkForPreselections() {
+        // Check if there's a pre-selected Bible ID in sessionStorage
+        const preselectedBibleId = sessionStorage.getItem('preselect_bible_id');
+        const preselectedBooks = sessionStorage.getItem('preselect_books');
+        
+        if (preselectedBibleId) {
+            // Wait for Bible options to load, then select
+            const checkBibleLoaded = setInterval(function() {
+                const $bibleSelect = $('#bible');
+                if ($bibleSelect.find('option[value="' + preselectedBibleId + '"]').length) {
+                    $bibleSelect.val(preselectedBibleId).trigger('change');
+                    
+                    // After Bible is selected, books will load, then select books if specified
+                    if (preselectedBooks) {
+                        try {
+                            const bookCodes = JSON.parse(preselectedBooks);
+                            
+                            // Wait for books to load
+                            const checkBooksLoaded = setInterval(function() {
+                                const $bookSelect = $('#book');
+                                const allBooksLoaded = bookCodes.every(code => 
+                                    $bookSelect.find('option[value="' + code + '"]').length > 0
+                                );
+                                
+                                if (allBooksLoaded) {
+                                    $bookSelect.val(bookCodes).trigger('change');
+                                    clearInterval(checkBooksLoaded);
+                                    
+                                    // Clear the session storage to prevent reselection on page reload
+                                    sessionStorage.removeItem('preselect_bible_id');
+                                    sessionStorage.removeItem('preselect_books');
+                                    
+                                    // Auto-scroll to the form
+                                    $('html, body').animate({
+                                        scrollTop: $('#bible').closest('.card').offset().top - 50
+                                    }, 500);
+                                    
+                                    // Highlight the form
+                                    $('#bible').closest('.card').addClass('highlight-card');
+                                    setTimeout(function() {
+                                        $('#bible').closest('.card').removeClass('highlight-card');
+                                    }, 2000);
+                                    
+                                    // Show toast notification
+                                    showToast('Sách đã chọn', 'Kinh Thánh và Sách đã được chọn từ trang quản lý', 'info');
+                                }
+                            }, 200);
+                            
+                            // Clear interval after 10 seconds to prevent endless checking
+                            setTimeout(function() {
+                                clearInterval(checkBooksLoaded);
+                            }, 10000);
+                        } catch (e) {
+                            console.error('Error parsing preselected books', e);
+                        }
+                    }
+                    
+                    clearInterval(checkBibleLoaded);
+                }
+            }, 200);
+            
+            // Clear interval after 10 seconds to prevent endless checking
+            setTimeout(function() {
+                clearInterval(checkBibleLoaded);
+            }, 10000);
         }
     }
 </script>
